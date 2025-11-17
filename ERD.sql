@@ -1,15 +1,4 @@
--- 1. 車輛表
-'''
-CREATE TABLE vehicles (
-    vehicle_id SERIAL PRIMARY KEY,
-    vehicle_number VARCHAR(20) UNIQUE NOT NULL,
-);
-
-COMMENT ON TABLE vehicles IS '車輛基本資料';
-COMMENT ON COLUMN vehicles.vehicle_number IS '車輛編號: 001A, 001B, MRV001';
-'''
-
--- 2. 系統表
+-- 1. 系統表
 CREATE TABLE systems (
     system_id SERIAL PRIMARY KEY,
     system_code VARCHAR(50) UNIQUE NOT NULL,
@@ -20,7 +9,7 @@ COMMENT ON TABLE systems IS '系統表';
 COMMENT ON COLUMN systems.system_code IS '系統編碼';
 COMMENT ON COLUMN systems.system_name IS '系統名稱';
 
--- 3. 零件表
+-- 2. 零件表
 CREATE TABLE parts (
     part_id SERIAL PRIMARY KEY,
     drawing_number VARCHAR(100) UNIQUE NOT NULL,
@@ -35,7 +24,7 @@ COMMENT ON COLUMN parts.part_name IS '零件名稱';
 COMMENT ON COLUMN parts.unit_price IS '單價';
 COMMENT ON COLUMN parts.sepcification IS '規格說明';
 
--- 4. 系統零件關聯表 (記錄每個零件在哪個系統使用及用量)
+-- 3. 系統零件關聯表 (記錄每個零件在哪個系統使用及用量)
 CREATE TABLE system_parts (
     id SERIAL PRIMARY KEY,
     system_id INTEGER NOT NULL,
@@ -50,7 +39,7 @@ COMMENT ON COLUMN system_parts.system_id IS '系統ID';
 COMMENT ON COLUMN system_parts.part_id IS '零件ID';
 COMMENT ON COLUMN system_parts.quantity_per_vehicle IS '每輛車用量';
 
--- 5. 庫存表 (現有庫存 + 新採購)
+-- 4. 庫存表 (現有庫存 + 新採購)
 CREATE TABLE stock_inventory (
     inventory_id SERIAL PRIMARY KEY,
     part_id INTEGER NOT NULL,
