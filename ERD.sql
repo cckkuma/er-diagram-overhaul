@@ -6,6 +6,3 @@ CREATE TABLE systems (
     system_code VARCHAR(50) NOT NULL UNIQUE,
     system_name VARCHAR(200) NOT NULL
 );
-
--- 註釋
-COMMENT ON TABLE systems IS '列車系統表';
