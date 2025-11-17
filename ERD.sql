@@ -7,7 +7,7 @@ CREATE TABLE vehicles (
     power_type ENUM('750DC', 'DIESEL') NOT NULL COMMENT '供能方式',
     remarks TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='車輛基本資料';
+) ;
 
 -- 2. 系統表 (支援多層級結構)
 CREATE TABLE systems (
@@ -19,7 +19,7 @@ CREATE TABLE systems (
     applicable_to SET('SUT_A', 'SUT_B', 'MRV') NOT NULL COMMENT '適用車型',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (parent_system_id) REFERENCES systems(system_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系統層級結構';
+) ;
 
 -- 3. 零件表
 CREATE TABLE parts (
@@ -29,7 +29,7 @@ CREATE TABLE parts (
     unit_price DECIMAL(10, 2) COMMENT '單價',
     remarks TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='零件主資料';
+) ;
 
 -- 4. 系統零件關聯表 (記錄每個零件在哪個系統使用及用量)
 CREATE TABLE system_parts (
@@ -42,7 +42,7 @@ CREATE TABLE system_parts (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (system_id) REFERENCES systems(system_id),
     FOREIGN KEY (part_id) REFERENCES parts(part_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系統零件用量';
+) ;
 
 -- 5. 庫存表 (現有庫存 + 新採購)
 CREATE TABLE stock_inventory (
@@ -56,7 +56,7 @@ CREATE TABLE stock_inventory (
     remarks TEXT COMMENT '備註: 可記錄多個stock code問題',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (part_id) REFERENCES parts(part_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='庫存資料';
+) ;
 
 -- ============================================
 -- 創建索引
