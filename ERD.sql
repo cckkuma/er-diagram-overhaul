@@ -1,38 +1,24 @@
 -- 1. 車輛表
+'''
 CREATE TABLE vehicles (
     vehicle_id SERIAL PRIMARY KEY,
     vehicle_number VARCHAR(20) UNIQUE NOT NULL,
-    vehicle_type VARCHAR(10) NOT NULL CHECK (vehicle_type IN ('SUT_A', 'SUT_B', 'MRV')),
-    train_set VARCHAR(10),
-    power_type VARCHAR(10) NOT NULL CHECK (power_type IN ('750DC', 'DIESEL')),
-    remarks TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 COMMENT ON TABLE vehicles IS '車輛基本資料';
 COMMENT ON COLUMN vehicles.vehicle_number IS '車輛編號: 001A, 001B, MRV001';
-COMMENT ON COLUMN vehicles.vehicle_type IS '車輛類型';
-COMMENT ON COLUMN vehicles.train_set IS '列車組號: 001, 002...';
-COMMENT ON COLUMN vehicles.power_type IS '供能方式';
+'''
 
--- 2. 系統表 (支援多層級結構)
+-- 2. 系統表
 CREATE TABLE systems (
     system_id SERIAL PRIMARY KEY,
     system_code VARCHAR(50) UNIQUE NOT NULL,
     system_name VARCHAR(100) NOT NULL,
-    parent_system_id INTEGER,
-    level_type VARCHAR(20) NOT NULL CHECK (level_type IN ('SYSTEM', 'SUBSYSTEM', 'COMPONENT')),
-    applicable_to TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (parent_system_id) REFERENCES systems(system_id)
 );
 
-COMMENT ON TABLE systems IS '系統層級結構';
+COMMENT ON TABLE systems IS '系統表';
 COMMENT ON COLUMN systems.system_code IS '系統編碼';
-COMMENT ON COLUMN systems.system_name IS '系統名稱: Brake system, piping, hang valve...';
-COMMENT ON COLUMN systems.parent_system_id IS '父系統ID (NULL=頂層系統)';
-COMMENT ON COLUMN systems.level_type IS '層級';
-COMMENT ON COLUMN systems.applicable_to IS '適用車型 (多選以逗號分隔)';
+COMMENT ON COLUMN systems.system_name IS '系統名稱';
 
 -- 3. 零件表
 CREATE TABLE parts (
@@ -40,14 +26,14 @@ CREATE TABLE parts (
     drawing_number VARCHAR(100) UNIQUE NOT NULL,
     part_name VARCHAR(200) NOT NULL,
     unit_price DECIMAL(10, 2),
-    remarks TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    specification TEXT,
 );
 
 COMMENT ON TABLE parts IS '零件主資料';
-COMMENT ON COLUMN parts.drawing_number IS '圖號/型號';
-COMMENT ON COLUMN parts.part_name IS '零件名稱: O-ring (P9, NBR)';
+COMMENT ON COLUMN parts.drawing_number IS '型號';
+COMMENT ON COLUMN parts.part_name IS '零件名稱';
 COMMENT ON COLUMN parts.unit_price IS '單價';
+COMMENT ON COLUMN parts.sepcification IS '規格說明';
 
 -- 4. 系統零件關聯表 (記錄每個零件在哪個系統使用及用量)
 CREATE TABLE system_parts (
@@ -55,9 +41,6 @@ CREATE TABLE system_parts (
     system_id INTEGER NOT NULL,
     part_id INTEGER NOT NULL,
     quantity_per_vehicle INTEGER NOT NULL,
-    applicable_to TEXT NOT NULL,
-    manual_reference VARCHAR(100),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (system_id) REFERENCES systems(system_id),
     FOREIGN KEY (part_id) REFERENCES parts(part_id)
 );
@@ -66,8 +49,6 @@ COMMENT ON TABLE system_parts IS '系統零件用量';
 COMMENT ON COLUMN system_parts.system_id IS '系統ID';
 COMMENT ON COLUMN system_parts.part_id IS '零件ID';
 COMMENT ON COLUMN system_parts.quantity_per_vehicle IS '每輛車用量';
-COMMENT ON COLUMN system_parts.applicable_to IS '適用車型 (多選以逗號分隔)';
-COMMENT ON COLUMN system_parts.manual_reference IS 'Manual參考';
 
 -- 5. 庫存表 (現有庫存 + 新採購)
 CREATE TABLE stock_inventory (
