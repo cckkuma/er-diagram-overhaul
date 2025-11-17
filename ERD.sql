@@ -1,13 +1,16 @@
 -- 1. 系統表
 CREATE TABLE systems (
     system_id SERIAL PRIMARY KEY,
-    system_code VARCHAR(50) UNIQUE NOT NULL,
+    system_code VARCHAR(50) NOT NULL UNIQUE,
     system_name VARCHAR(100) NOT NULL,
+    parent_system_id INTEGER,
+    level INTEGER NOT NULL CHECK (level IN (1, 2)),
+    description TEXT,
+    FOREIGN KEY (parent_system_id) REFERENCES systems(system_id) ON DELETE CASCADE
 );
 
 COMMENT ON TABLE systems IS '系統表';
-COMMENT ON COLUMN systems.system_code IS '系統編碼';
-COMMENT ON COLUMN systems.system_name IS '系統名稱';
+COMMENT ON COLUMN systems.level IS '1=主系統, 2=子系統';
 
 -- 2. 零件表
 CREATE TABLE parts (
