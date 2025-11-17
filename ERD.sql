@@ -90,8 +90,8 @@ CREATE TABLE parts_usage_log(
     train_id    INTEGER NOT NULL,
     part_id    INTEGER NOT NULL,
     system_id    INTEGER NOT NULL,
-    used_qty INTEGER NOT NULL CHECK (used_qty > 0)
-    usage_date DATE,
+    used_qty INTEGER NOT NULL CHECK (used_qty > 0),
+    usage_date DATE NOT NULL,
     remarks TEXT,
     FOREIGN KEY (train_id) REFERENCES train(train_id),
     FOREIGN KEY (part_id) REFERENCES parts(part_id),
