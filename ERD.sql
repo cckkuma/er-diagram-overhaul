@@ -29,7 +29,7 @@ CREATE TABLE system_parts (
     id SERIAL PRIMARY KEY,
     system_id INTEGER NOT NULL,
     part_id INTEGER NOT NULL,
-    quantity_per_vehicle INTEGER NOT NULL,
+    quantity_per_SUT INTEGER NOT NULL,
     FOREIGN KEY (system_id) REFERENCES systems(system_id),
     FOREIGN KEY (part_id) REFERENCES parts(part_id)
 );
@@ -37,7 +37,7 @@ CREATE TABLE system_parts (
 COMMENT ON TABLE system_parts IS '系統零件用量';
 COMMENT ON COLUMN system_parts.system_id IS '系統ID';
 COMMENT ON COLUMN system_parts.part_id IS '零件ID';
-COMMENT ON COLUMN system_parts.quantity_per_vehicle IS '每輛車用量';
+COMMENT ON COLUMN system_parts.quantity_per_SUT IS '每組SUT用量';
 
 -- 4. 庫存表 (現有庫存 + 新採購)
 CREATE TABLE stock_inventory (
@@ -45,10 +45,7 @@ CREATE TABLE stock_inventory (
     part_id INTEGER NOT NULL,
     stock_code VARCHAR(50),
     quantity INTEGER NOT NULL DEFAULT 0,
-    source_type VARCHAR(20) NOT NULL CHECK (source_type IN ('現有庫存', '新採購')),
-    supplier VARCHAR(100),
     purchase_date DATE,
-    remarks TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (part_id) REFERENCES parts(part_id)
 );
@@ -57,10 +54,7 @@ COMMENT ON TABLE stock_inventory IS '庫存資料';
 COMMENT ON COLUMN stock_inventory.part_id IS '零件ID';
 COMMENT ON COLUMN stock_inventory.stock_code IS '倉庫編號 (舊有庫存才有)';
 COMMENT ON COLUMN stock_inventory.quantity IS '數量';
-COMMENT ON COLUMN stock_inventory.source_type IS '來源';
-COMMENT ON COLUMN stock_inventory.supplier IS '供應商 (新採購才有)';
 COMMENT ON COLUMN stock_inventory.purchase_date IS '採購日期';
-COMMENT ON COLUMN stock_inventory.remarks IS '備註: 可記錄多個stock code問題';
 
 -- ============================================
 -- 創建索引
@@ -69,4 +63,4 @@ CREATE INDEX idx_parent_system ON systems(parent_system_id);
 CREATE INDEX idx_system_parts_system ON system_parts(system_id);
 CREATE INDEX idx_system_parts_part ON system_parts(part_id);
 CREATE INDEX idx_inventory_part ON stock_inventory(part_id);
-CREATE INDEX idx_inventory_source ON stock_inventory(source_type);
+
