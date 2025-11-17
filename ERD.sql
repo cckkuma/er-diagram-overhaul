@@ -65,7 +65,6 @@ COMMENT ON COLUMN stock_inventory.remarks IS '備註: 可記錄多個stock code�
 -- ============================================
 -- 創建索引
 -- ============================================
-CREATE INDEX idx_vehicle_type ON vehicles(vehicle_type);
 CREATE INDEX idx_parent_system ON systems(parent_system_id);
 CREATE INDEX idx_system_parts_system ON system_parts(system_id);
 CREATE INDEX idx_system_parts_part ON system_parts(part_id);
