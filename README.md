@@ -1,5 +1,3 @@
-# er-diagram-overhaul
-Overhaul parts
 
 erDiagram
     PARTS {
