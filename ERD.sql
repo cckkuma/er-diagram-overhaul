@@ -3,6 +3,11 @@ CREATE TABLE department
     ( dept_id    INTEGER NOT NULL PRIMARY KEY
     , dept_name  VARCHAR(50) NOT NULL
     ) ;
+CREATE TABLE test
+    ( test_id    INTEGER NOT NULL PRIMARY KEY
+    , system_name    VARCHAR(50) NOT NULL
+    , CONSTRAINT fk_test_dept FOREIGN KEY (dept_id) REFERENCES department(dept_id)
+    );
 CREATE TABLE job
     ( job_id         INTEGER NOT NULL PRIMARY KEY
     , job_title      VARCHAR(50) NOT NULL
