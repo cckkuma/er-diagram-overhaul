@@ -1,7 +1,8 @@
 -- ============================================
 -- 1. Systems（系統表）
 -- ============================================
-CREATE TABLE sys
-    ( dept_id    INTEGER NOT NULL PRIMARY KEY
-    , dept_name  VARCHAR(50) NOT NULL
-    ) ;
+CREATE TABLE systems( 
+    system_id    SERIAL PRIMARY KEY,
+    system_code    VARCHAR(50) NOT NULL UNIQUE,
+    system_name    VARCHAR(200) NOT NULL
+);
