@@ -60,7 +60,7 @@ CREATE TABLE overhaul_batch(
     end_date DATE,
     status    VARCHAR(20) NOT NULL,
     remarks TEXT,
-    FOREIGN KEY (batch_id) REFERENCES overhaul_batch(batch_id),
+    FOREIGN KEY (batch_id) REFERENCES overhaul_batch(batch_id)
 );
 
 -- ============================================
