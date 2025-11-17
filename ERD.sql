@@ -3,7 +3,6 @@
 -- ============================================
 CREATE TABLE systems( 
     system_id    SERIAL PRIMARY KEY,
-    system_code    VARCHAR(50) NOT NULL UNIQUE,
     system_name    VARCHAR(200) NOT NULL,
     description    TEXT
 );
@@ -18,6 +17,7 @@ CREATE TABLE parts(
     unit_price    NUMERIC(12, 2) CHECK (unit_price >= 0),
     unit_of_measure    VARCHAR(20),
     stock_code    VARCHAR(50),
+    stock_qty    INTEGER NOT NULL DEFAULT 0 CHECK (stock_qty >= 0),
     specification    TEXT,
     supplier_name    VARCHAR(50)
 );
@@ -53,7 +53,7 @@ CREATE TABLE overhaul_batch(
 -- ============================================
 -- 5. Train（車輛資料表）
 -- ============================================
-CREATE TABLE overhaul_batch( 
+CREATE TABLE train( 
     train_id    SERIAL PRIMARY KEY,
     batch_id    INTEGER NOT NULL,
     start_date DATE,
@@ -66,7 +66,7 @@ CREATE TABLE overhaul_batch(
 -- ============================================
 -- 6. Procurement Records（採購記錄表）
 -- ============================================
-CREATE TABLE overhaul_batch( 
+CREATE TABLE procurement_records( 
     po_id    SERIAL PRIMARY KEY,
     part_id    INTEGER NOT NULL,
     order_qty NUMERIC(10, 2) NOT NULL CHECK (order_qty > 0),
@@ -80,4 +80,20 @@ CREATE TABLE overhaul_batch(
     supplier VARCHAR(100),
     remarks TEXT,
     FOREIGN KEY (part_id) REFERENCES parts(part_id)
+);
+
+-- ============================================
+-- 7. Parts Usage Log（零件使用記錄表）
+-- ============================================
+CREATE TABLE parts_usage_log( 
+    usage_id    SERIAL PRIMARY KEY,
+    train_id    INTEGER NOT NULL,
+    part_id    INTEGER NOT NULL,
+    system_id    INTEGER NOT NULL,
+    used_qty INTEGER NOT NULL CHECK (used_qty > 0)
+    usage_date DATE NOT NULL,
+    remarks TEXT,
+    FOREIGN KEY (train_id) REFERENCES train(train_id),
+    FOREIGN KEY (part_id) REFERENCES parts(part_id),
+    FOREIGN KEY (system_id) REFERENCES systems(system_id)
 );
