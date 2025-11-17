@@ -1,62 +1,96 @@
 -- 1. 車輛表
 CREATE TABLE vehicles (
-    vehicle_id INTEGER NOT NULL PRIMARY KEY,
-    vehicle_number VARCHAR(20) UNIQUE NOT NULL COMMENT '車輛編號: 001A, 001B, MRV001',
-    vehicle_type ENUM('SUT_A', 'SUT_B', 'MRV') NOT NULL COMMENT '車輛類型',
-    train_set VARCHAR(10) COMMENT '列車組號: 001, 002...',
-    power_type ENUM('750DC', 'DIESEL') NOT NULL COMMENT '供能方式',
+    vehicle_id SERIAL PRIMARY KEY,
+    vehicle_number VARCHAR(20) UNIQUE NOT NULL,
+    vehicle_type VARCHAR(10) NOT NULL CHECK (vehicle_type IN ('SUT_A', 'SUT_B', 'MRV')),
+    train_set VARCHAR(10),
+    power_type VARCHAR(10) NOT NULL CHECK (power_type IN ('750DC', 'DIESEL')),
     remarks TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ;
+);
+
+COMMENT ON TABLE vehicles IS '車輛基本資料';
+COMMENT ON COLUMN vehicles.vehicle_number IS '車輛編號: 001A, 001B, MRV001';
+COMMENT ON COLUMN vehicles.vehicle_type IS '車輛類型';
+COMMENT ON COLUMN vehicles.train_set IS '列車組號: 001, 002...';
+COMMENT ON COLUMN vehicles.power_type IS '供能方式';
 
 -- 2. 系統表 (支援多層級結構)
 CREATE TABLE systems (
-    system_id INTEGER NOT NULL PRIMARY KEY,
-    system_code VARCHAR(50) UNIQUE NOT NULL COMMENT '系統編碼',
-    system_name VARCHAR(100) NOT NULL COMMENT '系統名稱: Brake system, piping, hang valve...',
-    parent_system_id INT NULL COMMENT '父系統ID (NULL=頂層系統)',
-    level_type ENUM('SYSTEM', 'SUBSYSTEM', 'COMPONENT') NOT NULL COMMENT '層級',
-    applicable_to SET('SUT_A', 'SUT_B', 'MRV') NOT NULL COMMENT '適用車型',
+    system_id SERIAL PRIMARY KEY,
+    system_code VARCHAR(50) UNIQUE NOT NULL,
+    system_name VARCHAR(100) NOT NULL,
+    parent_system_id INTEGER,
+    level_type VARCHAR(20) NOT NULL CHECK (level_type IN ('SYSTEM', 'SUBSYSTEM', 'COMPONENT')),
+    applicable_to TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (parent_system_id) REFERENCES systems(system_id)
-) ;
+);
+
+COMMENT ON TABLE systems IS '系統層級結構';
+COMMENT ON COLUMN systems.system_code IS '系統編碼';
+COMMENT ON COLUMN systems.system_name IS '系統名稱: Brake system, piping, hang valve...';
+COMMENT ON COLUMN systems.parent_system_id IS '父系統ID (NULL=頂層系統)';
+COMMENT ON COLUMN systems.level_type IS '層級';
+COMMENT ON COLUMN systems.applicable_to IS '適用車型 (多選以逗號分隔)';
 
 -- 3. 零件表
 CREATE TABLE parts (
-    part_id INTEGER NOT NULL PRIMARY KEY,
-    drawing_number VARCHAR(100) UNIQUE NOT NULL COMMENT '圖號/型號',
-    part_name VARCHAR(200) NOT NULL COMMENT '零件名稱: O-ring (P9, NBR)',
-    unit_price DECIMAL(10, 2) COMMENT '單價',
+    part_id SERIAL PRIMARY KEY,
+    drawing_number VARCHAR(100) UNIQUE NOT NULL,
+    part_name VARCHAR(200) NOT NULL,
+    unit_price DECIMAL(10, 2),
     remarks TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ;
+);
+
+COMMENT ON TABLE parts IS '零件主資料';
+COMMENT ON COLUMN parts.drawing_number IS '圖號/型號';
+COMMENT ON COLUMN parts.part_name IS '零件名稱: O-ring (P9, NBR)';
+COMMENT ON COLUMN parts.unit_price IS '單價';
 
 -- 4. 系統零件關聯表 (記錄每個零件在哪個系統使用及用量)
 CREATE TABLE system_parts (
-    id INTEGER NOT NULL PRIMARY KEY,
-    system_id INT NOT NULL COMMENT '系統ID',
-    part_id INT NOT NULL COMMENT '零件ID',
-    quantity_per_vehicle INT NOT NULL COMMENT '每輛車用量',
-    applicable_to SET('SUT_A', 'SUT_B', 'MRV') NOT NULL COMMENT '適用車型',
-    manual_reference VARCHAR(100) COMMENT 'Manual參考',
+    id SERIAL PRIMARY KEY,
+    system_id INTEGER NOT NULL,
+    part_id INTEGER NOT NULL,
+    quantity_per_vehicle INTEGER NOT NULL,
+    applicable_to TEXT NOT NULL,
+    manual_reference VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (system_id) REFERENCES systems(system_id),
     FOREIGN KEY (part_id) REFERENCES parts(part_id)
-) ;
+);
+
+COMMENT ON TABLE system_parts IS '系統零件用量';
+COMMENT ON COLUMN system_parts.system_id IS '系統ID';
+COMMENT ON COLUMN system_parts.part_id IS '零件ID';
+COMMENT ON COLUMN system_parts.quantity_per_vehicle IS '每輛車用量';
+COMMENT ON COLUMN system_parts.applicable_to IS '適用車型 (多選以逗號分隔)';
+COMMENT ON COLUMN system_parts.manual_reference IS 'Manual參考';
 
 -- 5. 庫存表 (現有庫存 + 新採購)
 CREATE TABLE stock_inventory (
-    inventory_id INTEGER NOT NULL PRIMARY KEY,
-    part_id INT NOT NULL COMMENT '零件ID',
-    stock_code VARCHAR(50) COMMENT '倉庫編號 (舊有庫存才有)',
-    quantity INT NOT NULL DEFAULT 0 COMMENT '數量',
-    source_type ENUM('現有庫存', '新採購') NOT NULL COMMENT '來源',
-    supplier VARCHAR(100) COMMENT '供應商 (新採購才有)',
-    purchase_date DATE COMMENT '採購日期',
-    remarks TEXT COMMENT '備註: 可記錄多個stock code問題',
+    inventory_id SERIAL PRIMARY KEY,
+    part_id INTEGER NOT NULL,
+    stock_code VARCHAR(50),
+    quantity INTEGER NOT NULL DEFAULT 0,
+    source_type VARCHAR(20) NOT NULL CHECK (source_type IN ('現有庫存', '新採購')),
+    supplier VARCHAR(100),
+    purchase_date DATE,
+    remarks TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (part_id) REFERENCES parts(part_id)
-) ;
+);
+
+COMMENT ON TABLE stock_inventory IS '庫存資料';
+COMMENT ON COLUMN stock_inventory.part_id IS '零件ID';
+COMMENT ON COLUMN stock_inventory.stock_code IS '倉庫編號 (舊有庫存才有)';
+COMMENT ON COLUMN stock_inventory.quantity IS '數量';
+COMMENT ON COLUMN stock_inventory.source_type IS '來源';
+COMMENT ON COLUMN stock_inventory.supplier IS '供應商 (新採購才有)';
+COMMENT ON COLUMN stock_inventory.purchase_date IS '採購日期';
+COMMENT ON COLUMN stock_inventory.remarks IS '備註: 可記錄多個stock code問題';
 
 -- ============================================
 -- 創建索引
