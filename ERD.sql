@@ -21,7 +21,7 @@ CREATE TABLE employee
     , CONSTRAINT ck_emp_sex CHECK (sex IN ('男', '女'))
     , CONSTRAINT ck_emp_salary CHECK (salary > 0)
     , CONSTRAINT uk_emp_email UNIQUE (email)
-    , CONSTRAINT fk_emp_dept FOREIGN KEY (dept_id) REFERENCES department(dept_id)
+    , CONSTRAINT fk_emp_dept FOREIGN KEY (dept_id) REFERENCES department_cc(dept_id)
     , CONSTRAINT fk_emp_job FOREIGN KEY (job_id) REFERENCES job(job_id)
     , CONSTRAINT fk_emp_manager FOREIGN KEY (manager) REFERENCES employee(emp_id)
     ) ;
